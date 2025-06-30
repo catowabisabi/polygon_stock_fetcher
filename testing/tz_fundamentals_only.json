@@ -1,0 +1,59 @@
+
+ {
+    "symbol": "AAPL",
+    "annualDividend": 0.94,
+    "atm_urgency": 0,
+    "averageVolume3M": null,
+    "beta": null,
+    "bookValue": null,
+    "close_change_percentage": -2.76,
+    "countryDomicile": "US",
+    "countryIncorporation": "US",
+    "day_close": 195.8,
+    "day_high": 202.03,
+    "day_low": 193.2,
+    "dividendFrequency": "Quarter",
+    "earningsPerShare": null,
+    "earningsPerShareTTM": null,
+    "exDividend": "2023-08-11T00:00:00",
+    "float": {
+      "$numberLong": "14703354192"
+    },
+    "float_risk": "Acceptable",
+    "forwardEarningsPerShare": null,
+    "high_change_percentage": 0.33,
+    "hype_score": 0,
+    "industry": "Computers",
+    "isin": "US0378331005",
+    "key_levels": [
+      202.16, 202.75, 202.8, 202.94, 203.51
+    ],
+    "last12MonthDividend": 0.94,
+    "lastDividend": 0.24,
+    "lastSplitDate": "2020-08-31T00:00:00",
+    "lastSplitInfo": "4 for 1",
+    "listingExchange": "US",
+    "lotSize": null,
+    "market_open_high": 197.11,
+    "market_open_low": 193.46,
+    "most_volume_high": 196.23,
+    "most_volume_low": 195.14,
+    "name": "Apple Inc",
+    "nextEarnings": null,
+    "optionable": true,
+    "outstandingShares": {
+      "$numberLong": "15634232000"
+    },
+    "premarket_high": 202.03,
+    "premarket_low": 193.13,
+    "sales": null,
+    "sector": "Technology",
+    "securityType": "Common Stock",
+    "short_signal": false,
+    "squeeze_score": 0,
+    "today_date": "2025-05-26",
+    "turnoverPercentage": null,
+    "yesterday_close": 201.36
+
+   
+  }

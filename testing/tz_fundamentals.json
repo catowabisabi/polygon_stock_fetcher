@@ -1,0 +1,164 @@
+
+ {
+    "symbol": "AAPL",
+    "1d_chart_data": [
+      {
+        "datetime": {
+          "$date": "2020-08-12T00:00:00.000Z"
+        },
+        "open": 110.4975,
+        "high": 113.275,
+        "low": 110.2975,
+        "close": 113.01,
+        "volume": 165944800
+      },
+      {
+        "datetime": {
+          "$date": "2020-08-13T00:00:00.000Z"
+        },
+        "open": 114.43,
+        "high": 116.0425,
+        "low": 113.9275,
+        "close": 115.01,
+        "volume": 210082000
+      }
+      
+    ],
+    "1m_chart_data": [
+      {
+        "datetime": {
+          "$date": "2025-05-22T16:00:00.000Z"
+        },
+        "open": 201.17,
+        "high": 201.45,
+        "low": 201.1,
+        "close": 201.37,
+        "volume": 14157
+      },
+      {
+        "datetime": {
+          "$date": "2025-05-22T16:01:00.000Z"
+        },
+        "open": 201.37,
+        "high": 201.4,
+        "low": 201.08,
+        "close": 201.15,
+        "volume": 392
+      }
+
+    ],
+    "5m_chart_data": [
+      {
+        "datetime": {
+          "$date": "2025-05-15T16:05:00.000Z"
+        },
+        "open": 211.44,
+        "high": 211.47,
+        "low": 210.92,
+        "close": 211.25,
+        "volume": 858
+      },
+      {
+        "datetime": {
+          "$date": "2025-05-15T16:10:00.000Z"
+        },
+        "open": 211.25,
+        "high": 211.3,
+        "low": 211.12,
+        "close": 211.2,
+        "volume": 235
+      }
+      
+    ],
+    "annualDividend": 0.94,
+    "atm_urgency": 0,
+    "averageVolume3M": null,
+    "beta": null,
+    "bookValue": null,
+    "close_change_percentage": -2.76,
+    "countryDomicile": "US",
+    "countryIncorporation": "US",
+    "day_close": 195.8,
+    "day_high": 202.03,
+    "day_low": 193.2,
+    "dividendFrequency": "Quarter",
+    "earningsPerShare": null,
+    "earningsPerShareTTM": null,
+    "exDividend": "2023-08-11T00:00:00",
+    "float": {
+      "$numberLong": "14703354192"
+    },
+    "float_risk": "Acceptable",
+    "forwardEarningsPerShare": null,
+    "high_change_percentage": 0.33,
+    "hype_score": 0,
+    "industry": "Computers",
+    "isin": "US0378331005",
+    "key_levels": [
+      202.16, 202.75, 202.8, 202.94, 203.51
+    ],
+    "last12MonthDividend": 0.94,
+    "lastDividend": 0.24,
+    "lastSplitDate": "2020-08-31T00:00:00",
+    "lastSplitInfo": "4 for 1",
+    "listingExchange": "US",
+    "lotSize": null,
+    "market_open_high": 197.11,
+    "market_open_low": 193.46,
+    "most_volume_high": 196.23,
+    "most_volume_low": 195.14,
+    "name": "Apple Inc",
+    "nextEarnings": null,
+    "optionable": true,
+    "outstandingShares": {
+      "$numberLong": "15634232000"
+    },
+    "premarket_high": 202.03,
+    "premarket_low": 193.13,
+    "sales": null,
+    "sector": "Technology",
+    "securityType": "Common Stock",
+    "short_signal": false,
+    "squeeze_score": 0,
+    "today_date": "2025-05-26",
+    "turnoverPercentage": null,
+    "yesterday_close": 201.36,
+    "suggestion": "根據該新聞，雖然特朗普強調提振美國高科技及軍事製造業的關稅政策，短線來看，該消息對相關製造業（如軍工、科技硬體股）可能形成支撐甚至刺激，多數情緒偏正面，但並沒有極強的短期利好反應。\n\n建議：\n\n- 關注與美國高科技及軍工產業鏈有關個股，避免輕易於這些標的做空，因政策消息有機會吸引短線資金炒作。\n- 紡織、鞋服、蘋果供應鏈等進口依賴度高的消費品板塊短線面臨負面情緒，可觀察有否反彈後尋找高位做空機會。\n- 整體來說，科技、軍工等標的短線不建議主動做空，宜緊盯相關資金流及追蹤政策進一步發酵情況。\n\n如無極端利好反應，可重點尋找消費品、紡織行業的弱勢股機會。",
+    "sec_filing_analysis": {
+      "Symbol": "AAPL",
+      "CIK": "0000320193",
+      "Cash (USD)": {
+        "$numberLong": "28162000000"
+      },
+      "Cash": "$28162.00M",
+      "Debt (USD)": {
+        "$numberLong": "92200000000"
+      },
+      "Debt": "$92200.00M",
+      "Cash/Debt Ratio": "30.5%",
+      "Burn Rate (months)": "N/A",
+      "Total Shelf Filings": 4,
+      "Valid Shelf Filings": 1,
+      "Last Shelf Date": "2024-11-01",
+      "ATM Risk Level": "Medium",
+      "Risk Reason": "Adequate liquidity",
+      "Industry Cash Benchmark": "Above",
+      "Data Date": "2025-05-26",
+      "Trading Recommendation": "Hold with caution",
+      "Recommendation Confidence": "Medium",
+      "Recommendation Reasons": [
+        "Moderate dilution risk",
+        "Active shelf registration increases dilution possibility"
+      ],
+      "Trading Strategy": "Normal position sizing with standard risk management; Be prepared for potential offerings",
+      "Short Squeeze Risk": "Low short squeeze risk"
+    },
+    "raw_news": [
+      {
+        "uuid": "09445a31-5bc4-4b38-ab8f-1b0ea5c07b37",
+        "text": "testing news",
+        "summary": "這是一則測試新聞，僅用於系統測試或演示，並不涉及實際新聞事件。",
+        "timestamp": "2025-06-01T18:09:03.803371-04:00"
+      }
+    ]
+  }
