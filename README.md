@@ -1,4 +1,4 @@
-# 🤖 TZ Bot Lite - Pennystock Fetcher
+# 🤖 TZ Bot Lite - Stock Data Fetcher
 
 > **Language / 語言**: [English](#english) | [繁體中文](#繁體中文)
 
@@ -6,32 +6,29 @@
 
 ## English
 
-A comprehensive premarket penny stock scanner and automation tool designed to help users automate operations on the TradeZero platform. This project provides real-time market data fetching, analysis, and automated trading capabilities for penny stocks and low-float securities.
+A comprehensive stock data fetching and analysis tool powered by Polygon.io API. This project provides real-time market data fetching and analysis capabilities for stocks, with features for historical data retrieval and technical analysis.
 
 ### 🚀 Key Features
 
-- **Premarket Scanner** - Real-time penny stock scanning during premarket hours
-- **TradeZero Integration** - Seamless automation of TradeZero platform operations
-- **Multi-Database Support** - Flexible data storage with SQLite and MongoDB options
 - **Real-time Data** - Integration with Polygon.io API for live market data
-- **Low-Float Detection** - Specialized algorithms for identifying low-float penny stocks
+- **Historical Data** - Fetch and analyze historical price data
+- **Multi-Database Support** - Flexible data storage with SQLite and MongoDB options
+- **Technical Analysis** - Built-in technical analysis tools
 - **Automated Analysis** - Advanced filtering and ranking algorithms
-- **Risk Management** - Built-in position sizing and risk control features
+- **Data Visualization** - Tools for visualizing price and volume data
 
 ### 🗂 Project Structure
 
 ```bash
-tz_bot_lite_pennystock_fetcher/
+polygon_stock_fetcher/
 ├── run_with_polygon.py      # Main entry point with Polygon API integration
 ├── environment.yml          # Conda environment configuration
-├── data/                    # Data storage directory
-├── src/                     # Source code modules
-│   ├── scanner/            # Stock scanning modules
-│   ├── database/           # Database management
-│   ├── api/                # API integrations
-│   └── utils/              # Utility functions
-├── config/                 # Configuration files
-├── logs/                   # Application logs
+├── api_polygon/            # Polygon API integration modules
+├── data_handler/           # Data processing modules
+├── utils/                  # Utility functions
+│   ├── _database/         # Database management
+│   ├── _news/             # News data handling
+│   └── logger/            # Logging utilities
 └── requirements.txt        # Python dependencies
 ```
 
@@ -40,21 +37,20 @@ tz_bot_lite_pennystock_fetcher/
 #### Prerequisites
 
 - Python 3.8 or higher
-- TradeZero account (for trading features)
-- Polygon.io API key (for real-time data)
+- Polygon.io API key
 
 #### Environment Setup
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/catowabisabi/tz_bot_lite_pennystock_fetcher.git
-   cd tz_bot_lite_pennystock_fetcher
+   git clone https://github.com/catowabisabi/tz_bot_lite_stock_fetcher.git
+   cd tz_bot_lite_stock_fetcher
    ```
 
 2. **Create Conda environment**
    ```bash
    conda env create -f environment.yml
-   conda activate tradebot
+   conda activate stockdata
    ```
 
 3. **Alternative: pip installation**
@@ -62,50 +58,44 @@ tz_bot_lite_pennystock_fetcher/
    pip install -r requirements.txt
    ```
 
-4. **Configure API keys**
+4. **Configure API key**
    ```bash
    # Create .env file with your API credentials
    POLYGON_API_KEY=your_polygon_api_key
-   TRADEZERO_USERNAME=your_username
-   TRADEZERO_PASSWORD=your_password
    ```
 
 ### 🚀 Quick Start
 
-#### Basic Scanner Usage
+#### Basic Usage
 
 ```bash
-# Run the main scanner with Polygon integration
+# Run the main data fetcher with Polygon integration
 python run_with_polygon.py
 ```
 
 #### Advanced Configuration
 
 ```python
-# Example configuration for penny stock scanning
-from src.scanner import PennystockScanner
+# Example configuration for data fetching
+from api_polygon import PolygonController
 
-scanner = PennystockScanner(
-    price_range=(0.01, 5.00),    # Penny stock price range
-    volume_threshold=100000,      # Minimum volume
-    float_threshold=50000000,     # Maximum float
-    premarket_only=True          # Scan premarket only
+controller = PolygonController(
+    timespan="1m",          # 1-minute data
+    multiplier=1,           # Time multiplier
+    from_date="2024-01-01", # Start date
+    to_date="2024-01-15"    # End date
 )
 
-results = scanner.scan()
+data = controller.get_aggs("AAPL")
 ```
 
 ### 📊 Features in Detail
 
-#### Premarket Scanner
-- Scans for penny stocks with unusual volume during premarket hours
-- Filters stocks based on price, volume, and float criteria
-- Real-time alerts for significant price movements
-
-#### TradeZero Automation
-- Automated order placement and management
-- Position tracking and profit/loss monitoring
-- Risk management with stop-loss automation
+#### Data Fetching
+- Real-time and historical price data
+- Multiple timeframes support (1m, 5m, 1h, 1d)
+- Volume and trade data
+- Technical indicators
 
 #### Data Management
 - **SQLite**: Lightweight local database for historical data
@@ -114,17 +104,16 @@ results = scanner.scan()
 
 ### 🔧 Configuration Options
 
-#### Scanner Parameters
+#### Data Fetching Parameters
 
 ```python
-SCANNER_CONFIG = {
-    'price_min': 0.01,           # Minimum stock price
-    'price_max': 5.00,           # Maximum stock price
-    'volume_min': 50000,         # Minimum daily volume
-    'float_max': 100000000,      # Maximum float
-    'gap_percentage': 10,        # Minimum gap percentage
-    'premarket_start': '04:00',  # Premarket scan start time
-    'premarket_end': '09:30'     # Premarket scan end time
+FETCH_CONFIG = {
+    'timespan': '1m',           # Time interval
+    'multiplier': 1,            # Time multiplier
+    'limit': 50000,             # Maximum data points
+    'adjusted': True,           # Adjusted for splits
+    'sort': 'asc',             # Sort direction
+    'cache': True              # Enable data caching
 }
 ```
 
@@ -135,53 +124,48 @@ DATABASE_CONFIG = {
     'type': 'sqlite',            # 'sqlite' or 'mongodb'
     'sqlite_path': './data/stocks.db',
     'mongodb_uri': 'mongodb://localhost:27017/',
-    'mongodb_db': 'pennystock_data'
+    'mongodb_db': 'stock_data'
 }
 ```
 
 ### 📈 Sample Output
 
 ```
-=== Premarket Penny Stock Scanner Results ===
+=== Stock Data Fetcher Results ===
 Time: 2024-01-15 08:30:00 EST
 
-Top Gainers:
-1. ABCD - $0.85 (+45.2%) | Vol: 2.1M | Float: 25M
-2. EFGH - $1.23 (+38.7%) | Vol: 1.8M | Float: 18M
-3. IJKL - $0.67 (+29.1%) | Vol: 3.2M | Float: 42M
+AAPL Data:
+- Current Price: $185.92
+- Volume: 1.2M
+- VWAP: $185.45
+- Number of Trades: 2,500
 
-Top Volume:
-1. MNOP - $2.14 | Vol: 5.8M | Change: +12.3%
-2. QRST - $0.92 | Vol: 4.2M | Change: +8.7%
-3. UVWX - $1.56 | Vol: 3.9M | Change: +15.2%
-
-Alerts Generated: 12
+Data Points Retrieved: 1000
 Database Records Updated: 156
+Cache Hit Rate: 85%
 ```
 
 ### 🧠 Learning Resources
 
 - [Polygon.io API Documentation](https://polygon.io/docs)
-- [TradeZero Platform Guide](https://www.tradezero.co/)
-- [Penny Stock Trading Strategies](https://www.investopedia.com/articles/trading/penny-stock-trading-strategies/)
-- [Python Trading Bot Development](https://www.quantstart.com/)
+- [Python Trading Data Analysis](https://www.quantstart.com/)
+- [Technical Analysis Basics](https://www.investopedia.com/technical-analysis-4689657)
 
 ### ⚠️ Important Disclaimers
 
-- **Risk Warning**: Penny stock trading involves significant risk. Past performance does not guarantee future results.
-- **Not Financial Advice**: This tool is for educational and research purposes only.
-- **API Limits**: Respect API rate limits and terms of service.
-- **Regulatory Compliance**: Ensure compliance with local trading regulations.
+- **Not Financial Advice**: This tool is for educational and research purposes only
+- **API Limits**: Respect Polygon.io API rate limits and terms of service
+- **Data Accuracy**: While we strive for accuracy, always verify critical data
 
 ### 📌 Roadmap & Future Features
 
-- [ ] **Web Interface** - Browser-based dashboard for monitoring
-- [ ] **Mobile Alerts** - Push notifications for significant events
-- [ ] **Advanced Analytics** - Machine learning-based prediction models
-- [ ] **Multi-Broker Support** - Integration with additional brokers
+- [ ] **Web Interface** - Browser-based dashboard for data visualization
+- [ ] **Advanced Analytics** - Machine learning-based analysis
 - [ ] **Backtesting Engine** - Historical strategy testing capabilities
-- [ ] **Social Media Integration** - Sentiment analysis from Twitter/Reddit
-- [ ] **Options Chain Analysis** - Options flow and unusual activity detection
+- [ ] **Real-time Alerts** - Price and volume movement notifications
+- [ ] **Multi-Asset Support** - Support for crypto and forex data
+- [ ] **Custom Indicators** - User-defined technical indicators
+- [ ] **Data Export** - Multiple format export options
 
 ### 🛠 Troubleshooting
 
@@ -199,11 +183,6 @@ python -c "import os; print(os.getenv('POLYGON_API_KEY'))"
 python -c "from src.database import test_connection; test_connection()"
 ```
 
-**TradeZero Login Problems**
-- Verify credentials in .env file
-- Check for two-factor authentication requirements
-- Ensure account has API access enabled
-
 ### 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -220,40 +199,37 @@ We welcome contributions! Please follow these steps:
 
 ### 📞 Support & Contact
 
-- **Issues**: [GitHub Issues](https://github.com/catowabisabi/tz_bot_lite_pennystock_fetcher/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/catowabisabi/tz_bot_lite_pennystock_fetcher/discussions)
-- **Wiki**: [Project Wiki](https://github.com/catowabisabi/tz_bot_lite_pennystock_fetcher/wiki)
+- **Issues**: [GitHub Issues](https://github.com/catowabisabi/tz_bot_lite_stock_fetcher/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/catowabisabi/tz_bot_lite_stock_fetcher/discussions)
+- **Wiki**: [Project Wiki](https://github.com/catowabisabi/tz_bot_lite_stock_fetcher/wiki)
 
 ---
 
 ## 繁體中文
 
-一個全面的盤前便士股掃描器和自動化工具，旨在幫助用戶自動化 TradeZero 平台的操作。本專案提供即時市場數據抓取、分析和便士股及低流通量證券的自動化交易功能。
+一個由 Polygon.io API 驅動的全面股票數據獲取和分析工具。本專案提供即時市場數據獲取和分析功能，包括歷史數據檢索和技術分析功能。
 
 ### 🚀 主要功能
 
-- **盤前掃描器** - 盤前時段即時便士股掃描
-- **TradeZero 整合** - 無縫自動化 TradeZero 平台操作
-- **多資料庫支援** - 彈性數據存儲，支援 SQLite 和 MongoDB
 - **即時數據** - 整合 Polygon.io API 提供即時市場數據
-- **低流通量檢測** - 專門演算法識別低流通量便士股
+- **歷史數據** - 獲取和分析歷史價格數據
+- **多資料庫支援** - 彈性數據存儲，支援 SQLite 和 MongoDB
+- **技術分析** - 內建技術分析工具
 - **自動化分析** - 進階篩選和排序演算法
-- **風險管理** - 內建倉位大小和風險控制功能
+- **數據視覺化** - 價格和成交量數據視覺化工具
 
 ### 🗂 專案結構
 
 ```bash
-tz_bot_lite_pennystock_fetcher/
+tz_bot_lite_stock_fetcher/
 ├── run_with_polygon.py      # 主要進入點，整合 Polygon API
 ├── environment.yml          # Conda 環境配置
-├── data/                    # 數據存儲目錄
-├── src/                     # 原始碼模組
-│   ├── scanner/            # 股票掃描模組
-│   ├── database/           # 資料庫管理
-│   ├── api/                # API 整合
-│   └── utils/              # 工具函數
-├── config/                 # 配置文件
-├── logs/                   # 應用程式日誌
+├── api_polygon/            # Polygon API 整合模組
+├── data_handler/           # 數據處理模組
+├── utils/                  # 工具函數
+│   ├── _database/         # 資料庫管理
+│   ├── _news/             # 新聞數據處理
+│   └── logger/            # 日誌工具
 └── requirements.txt        # Python 依賴套件
 ```
 
@@ -262,21 +238,20 @@ tz_bot_lite_pennystock_fetcher/
 #### 前置要求
 
 - Python 3.8 或更高版本
-- TradeZero 帳戶（用於交易功能）
-- Polygon.io API 金鑰（用於即時數據）
+- Polygon.io API 金鑰
 
 #### 環境設定
 
 1. **複製儲存庫**
    ```bash
-   git clone https://github.com/catowabisabi/tz_bot_lite_pennystock_fetcher.git
-   cd tz_bot_lite_pennystock_fetcher
+   git clone https://github.com/catowabisabi/tz_bot_lite_stock_fetcher.git
+   cd tz_bot_lite_stock_fetcher
    ```
 
 2. **建立 Conda 環境**
    ```bash
    conda env create -f environment.yml
-   conda activate tradebot
+   conda activate stockdata
    ```
 
 3. **替代方案：pip 安裝**
@@ -288,46 +263,40 @@ tz_bot_lite_pennystock_fetcher/
    ```bash
    # 建立 .env 檔案並填入您的 API 憑證
    POLYGON_API_KEY=您的_polygon_api_金鑰
-   TRADEZERO_USERNAME=您的_使用者名稱
-   TRADEZERO_PASSWORD=您的_密碼
    ```
 
 ### 🚀 快速開始
 
-#### 基本掃描器使用
+#### 基本使用
 
 ```bash
-# 執行主要掃描器，整合 Polygon
+# 執行主要數據獲取器，整合 Polygon
 python run_with_polygon.py
 ```
 
 #### 進階配置
 
 ```python
-# 便士股掃描配置範例
-from src.scanner import PennystockScanner
+# 數據獲取配置範例
+from api_polygon import PolygonController
 
-scanner = PennystockScanner(
-    price_range=(0.01, 5.00),    # 便士股價格範圍
-    volume_threshold=100000,      # 最小成交量
-    float_threshold=50000000,     # 最大流通量
-    premarket_only=True          # 僅掃描盤前
+controller = PolygonController(
+    timespan="1m",          # 1分鐘數據
+    multiplier=1,           # 時間乘數
+    from_date="2024-01-01", # 開始日期
+    to_date="2024-01-15"    # 結束日期
 )
 
-results = scanner.scan()
+data = controller.get_aggs("AAPL")
 ```
 
 ### 📊 功能詳述
 
-#### 盤前掃描器
-- 掃描盤前時段具有異常成交量的便士股
-- 根據價格、成交量和流通量標準篩選股票
-- 重大價格波動的即時警報
-
-#### TradeZero 自動化
-- 自動化訂單下單和管理
-- 持倉追蹤和損益監控
-- 停損自動化風險管理
+#### 數據獲取
+- 即時和歷史價格數據
+- 多時間框架支援（1分鐘、5分鐘、1小時、1天）
+- 成交量和交易數據
+- 技術指標
 
 #### 數據管理
 - **SQLite**：輕量級本地資料庫用於歷史數據
@@ -336,17 +305,16 @@ results = scanner.scan()
 
 ### 🔧 配置選項
 
-#### 掃描器參數
+#### 數據獲取參數
 
 ```python
-SCANNER_CONFIG = {
-    'price_min': 0.01,           # 最低股價
-    'price_max': 5.00,           # 最高股價
-    'volume_min': 50000,         # 最小日成交量
-    'float_max': 100000000,      # 最大流通量
-    'gap_percentage': 10,        # 最小跳空百分比
-    'premarket_start': '04:00',  # 盤前掃描開始時間
-    'premarket_end': '09:30'     # 盤前掃描結束時間
+FETCH_CONFIG = {
+    'timespan': '1m',           # 時間間隔
+    'multiplier': 1,            # 時間乘數
+    'limit': 50000,             # 最大數據點
+    'adjusted': True,           # 調整分割
+    'sort': 'asc',             # 排序方向
+    'cache': True              # 啟用數據緩存
 }
 ```
 
@@ -357,53 +325,48 @@ DATABASE_CONFIG = {
     'type': 'sqlite',            # 'sqlite' 或 'mongodb'
     'sqlite_path': './data/stocks.db',
     'mongodb_uri': 'mongodb://localhost:27017/',
-    'mongodb_db': 'pennystock_data'
+    'mongodb_db': 'stock_data'
 }
 ```
 
 ### 📈 範例輸出
 
 ```
-=== 盤前便士股掃描器結果 ===
+=== 股票數據獲取器結果 ===
 時間: 2024-01-15 08:30:00 EST
 
-漲幅榜:
-1. ABCD - $0.85 (+45.2%) | 成交量: 2.1M | 流通量: 25M
-2. EFGH - $1.23 (+38.7%) | 成交量: 1.8M | 流通量: 18M
-3. IJKL - $0.67 (+29.1%) | 成交量: 3.2M | 流通量: 42M
+AAPL 數據:
+- 當前價格: $185.92
+- 成交量: 1.2M
+- VWAP: $185.45
+- 交易次數: 2,500
 
-成交量排行:
-1. MNOP - $2.14 | 成交量: 5.8M | 漲幅: +12.3%
-2. QRST - $0.92 | 成交量: 4.2M | 漲幅: +8.7%
-3. UVWX - $1.56 | 成交量: 3.9M | 漲幅: +15.2%
-
-產生警報數: 12
+獲取數據點: 1000
 資料庫記錄更新: 156
+緩存命中率: 85%
 ```
 
 ### 🧠 學習資源
 
 - [Polygon.io API 文件](https://polygon.io/docs)
-- [TradeZero 平台指南](https://www.tradezero.co/)
-- [便士股交易策略](https://www.investopedia.com/articles/trading/penny-stock-trading-strategies/)
-- [Python 交易機器人開發](https://www.quantstart.com/)
+- [Python 交易數據分析](https://www.quantstart.com/)
+- [技術分析基礎](https://www.investopedia.com/technical-analysis-4689657)
 
 ### ⚠️ 重要免責聲明
 
-- **風險警告**：便士股交易涉及重大風險。過往表現不保證未來結果。
-- **非投資建議**：此工具僅用於教育和研究目的。
-- **API 限制**：請遵守 API 速率限制和服務條款。
-- **法規合規**：確保遵守當地交易法規。
+- **非投資建議**：此工具僅用於教育和研究目的
+- **API 限制**：請遵守 Polygon.io API 速率限制和服務條款
+- **數據準確性**：雖然我們致力於準確性，但重要數據請務必驗證
 
 ### 📌 路線圖與未來功能
 
-- [ ] **網頁介面** - 基於瀏覽器的監控儀表板
-- [ ] **手機警報** - 重大事件推播通知
-- [ ] **進階分析** - 基於機器學習的預測模型
-- [ ] **多券商支援** - 整合更多券商平台
+- [ ] **網頁介面** - 基於瀏覽器的數據視覺化儀表板
+- [ ] **進階分析** - 基於機器學習的分析
 - [ ] **回測引擎** - 歷史策略測試功能
-- [ ] **社群媒體整合** - Twitter/Reddit 情緒分析
-- [ ] **選擇權鏈分析** - 選擇權流量和異常活動檢測
+- [ ] **即時警報** - 價格和成交量變動通知
+- [ ] **多資產支援** - 支援加密貨幣和外匯數據
+- [ ] **自定義指標** - 用戶定義技術指標
+- [ ] **數據導出** - 多格式導出選項
 
 ### 🛠 故障排除
 
@@ -421,11 +384,6 @@ python -c "import os; print(os.getenv('POLYGON_API_KEY'))"
 python -c "from src.database import test_connection; test_connection()"
 ```
 
-**TradeZero 登入問題**
-- 驗證 .env 檔案中的憑證
-- 檢查雙重驗證要求
-- 確保帳戶已啟用 API 存取
-
 ### 📜 授權條款
 
 本專案使用 MIT 授權條款 - 詳見 [LICENSE](LICENSE) 檔案。
@@ -442,10 +400,10 @@ python -c "from src.database import test_connection; test_connection()"
 
 ### 📞 支援與聯絡
 
-- **問題回報**: [GitHub Issues](https://github.com/catowabisabi/tz_bot_lite_pennystock_fetcher/issues)
-- **討論區**: [GitHub Discussions](https://github.com/catowabisabi/tz_bot_lite_pennystock_fetcher/discussions)
-- **專案Wiki**: [Project Wiki](https://github.com/catowabisabi/tz_bot_lite_pennystock_fetcher/wiki)
+- **問題回報**: [GitHub Issues](https://github.com/catowabisabi/tz_bot_lite_stock_fetcher/issues)
+- **討論區**: [GitHub Discussions](https://github.com/catowabisabi/tz_bot_lite_stock_fetcher/discussions)
+- **專案Wiki**: [Project Wiki](https://github.com/catowabisabi/tz_bot_lite_stock_fetcher/wiki)
 
 ---
 
-[⬆️ Back to top / 回到頂部](#-tz-bot-lite---pennystock-fetcher)
+[⬆️ Back to top / 回到頂部](#-tz-bot-lite---stock-data-fetcher)
