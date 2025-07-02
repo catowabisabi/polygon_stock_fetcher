@@ -462,6 +462,8 @@ class DataHandler:
                 print("================================================")
                 print(f"\n\n\n📰 Fetching news...:{symbol}")
                 
+                news_data = []  # Initialize news_data list here
+                
                 try:
                     # 使用 Polygon API 獲取新聞
                     news_generator = self.polygon_controller.polygon_client.list_ticker_news(
@@ -476,7 +478,6 @@ class DataHandler:
                     
                     if news_list:
                         # 處理新聞數據
-                        news_data = []
                         for item in news_list:
                             try:
                                 # 轉換時間戳為UTC時間
@@ -503,9 +504,7 @@ class DataHandler:
                     # region Newsfilter API
                     news_filter_api = NewsfilterAPI()
                     news_filter_api_result = news_filter_api.get_news_from_newsfilter(symbol)
-                    if news_filter_api_result and news_filter_api_result['articles']:
-                        if not news_data:
-                            news_data = []
+                    if news_filter_api_result and news_filter_api_result.get('articles'):
                         for article in news_filter_api_result['articles']:
                             news_item = {
                                 "title": article['title'],
@@ -516,10 +515,6 @@ class DataHandler:
                                 "keywords": []
                             }
                             news_data.append(news_item)
-
-
-
-                        # endregion Newsfilter API
 
                     if news_data:
                         # 使用原有的 RVLNewsAnalyzer 來處理新聞
