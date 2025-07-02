@@ -500,26 +500,28 @@ class DataHandler:
                                 continue
 
                         
-                        # region Newsfilter API
-                        news_filter_api = NewsfilterAPI()
-                        news_filter_api_result = news_filter_api.get_news_from_newsfilter(symbol)
-                        if news_filter_api_result and news_filter_api_result['articles']:
-                            for article in news_filter_api_result['articles']:
-                                news_item = {
-                                    "title": article['title'],
-                                    "link": article['url'],
-                                    "publisher": article['source']['name'],
-                                    "symbols": [symbol.upper()],
-                                    "utcTime": article['publishedAt'],
-                                    "keywords": []
-                                }
-                                news_data.append(news_item)
+                    # region Newsfilter API
+                    news_filter_api = NewsfilterAPI()
+                    news_filter_api_result = news_filter_api.get_news_from_newsfilter(symbol)
+                    if news_filter_api_result and news_filter_api_result['articles']:
+                        if not news_data:
+                            news_data = []
+                        for article in news_filter_api_result['articles']:
+                            news_item = {
+                                "title": article['title'],
+                                "link": article['url'],
+                                "publisher": article['source']['name'],
+                                "symbols": [symbol.upper()],
+                                "utcTime": article['publishedAt'],
+                                "keywords": []
+                            }
+                            news_data.append(news_item)
 
 
 
                         # endregion Newsfilter API
 
-
+                    if news_data:
                         # 使用原有的 RVLNewsAnalyzer 來處理新聞
                         news_analyzer = RVLNewsAnalyzer()
                         summaries = news_analyzer.analyze(news_data)
