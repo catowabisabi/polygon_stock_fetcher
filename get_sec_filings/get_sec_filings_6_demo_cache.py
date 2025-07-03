@@ -358,12 +358,30 @@ class SECFinancialAnalyzer:
             'ATM Risk Level', 'Risk Reason'
         ]
         
-        # 格式化打印
+        # 确保所有必需的列都存在，如果不存在则填充 "N/A"
+        for col in display_cols:
+            if col not in df.columns:
+                df[col] = "N/A"
+        
+        # 检查是否有错误数据并打印
+        error_cases = df[df['Error'].notna()]
+        if not error_cases.empty:
+            print("\n" + "="*120)
+            print("ERRORS IN DATA FETCHING".center(120))
+            print("="*120)
+            for _, row in error_cases.iterrows():
+                print(f"Symbol: {row['Symbol']} - Error: {row['Error']}")
+            print("="*120)
+        
+        # 格式化打印所有数据
         print("\n" + "="*120)
         print("SEC ATM RISK ANALYSIS REPORT".center(120))
         print("="*120)
+        
+        # 替换 None 值为 "N/A"
+        display_df = df[display_cols].fillna("N/A")
         print(tabulate(
-            df[display_cols], 
+            display_df,
             headers='keys', 
             tablefmt='grid',
             showindex=False,
@@ -371,16 +389,22 @@ class SECFinancialAnalyzer:
         ))
         print("="*120)
         
-        # 打印风险分布摘要
-        risk_dist = df['ATM Risk Level'].value_counts()
-        print("\nRISK DISTRIBUTION:")
-        print(risk_dist.to_string())
-        
-        # 打印最高风险公司
-        high_risk = df[df['ATM Risk Level'].isin(['Very High', 'High'])]
-        if not high_risk.empty:
-            print("\nHIGH RISK COMPANIES:")
-            print(high_risk[['Symbol', 'ATM Risk Level', 'Risk Reason']].to_string(index=False))
+        # 打印风险分布摘要（只统计非错误和非N/A的数据）
+        valid_risk_data = df[
+            (df['Error'].isna()) & 
+            (df['ATM Risk Level'].notna()) & 
+            (df['ATM Risk Level'] != "N/A")
+        ]
+        if not valid_risk_data.empty:
+            risk_dist = valid_risk_data['ATM Risk Level'].value_counts()
+            print("\nRISK DISTRIBUTION:")
+            print(risk_dist.to_string())
+            
+            # 打印最高风险公司
+            high_risk = valid_risk_data[valid_risk_data['ATM Risk Level'].isin(['Very High', 'High'])]
+            if not high_risk.empty:
+                print("\nHIGH RISK COMPANIES:")
+                print(high_risk[['Symbol', 'ATM Risk Level', 'Risk Reason']].to_string(index=False))
         
         # 打印交易建议
         print("\n" + "="*120)
@@ -388,17 +412,25 @@ class SECFinancialAnalyzer:
         print("="*120)
         for result in results:
             if "Error" in result:
+                print(f"\n{result['Symbol']} - Unable to generate recommendations due to error: {result['Error']}")
                 continue
-            
-            print(f"\n{result['Symbol']} - {result['Trading Recommendation']} (Confidence: {result['Recommendation Confidence']})")
-            print(f"ATM Risk Level: {result['ATM Risk Level']}")
-            
-            print("Reasons:")
-            for i, reason in enumerate(result['Recommendation Reasons'], 1):
-                print(f"  {i}. {reason}")
                 
-            print(f"Trading Strategy: {result['Trading Strategy']}")
-            print(f"Short Squeeze Risk: {result['Short Squeeze Risk']}")
+            rec = result.get('Trading Recommendation', 'N/A')
+            conf = result.get('Recommendation Confidence', 'N/A')
+            risk = result.get('ATM Risk Level', 'N/A')
+            
+            print(f"\n{result['Symbol']} - {rec} (Confidence: {conf})")
+            print(f"ATM Risk Level: {risk}")
+            
+            if 'Recommendation Reasons' in result:
+                print("Reasons:")
+                for i, reason in enumerate(result['Recommendation Reasons'], 1):
+                    print(f"  {i}. {reason}")
+            
+            strategy = result.get('Trading Strategy', 'N/A')
+            squeeze_risk = result.get('Short Squeeze Risk', 'N/A')
+            print(f"Trading Strategy: {strategy}")
+            print(f"Short Squeeze Risk: {squeeze_risk}")
             print("-" * 80)
 
     def generate_html_report(self, results):
