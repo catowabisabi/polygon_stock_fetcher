@@ -506,15 +506,27 @@ class DataHandler:
                     news_filter_api_result = news_filter_api.get_news_from_newsfilter(symbol)
                     if news_filter_api_result and news_filter_api_result.get('articles'):
                         for article in news_filter_api_result['articles']:
-                            news_item = {
-                                "title": article['title'],
-                                "link": article['url'],
-                                "publisher": article['source']['name'],
-                                "symbols": [symbol.upper()],
-                                "utcTime": article['publishedAt'],
-                                "keywords": []
-                            }
-                            news_data.append(news_item)
+                            try:
+                                # Convert publishedAt string to UTC timestamp
+                                published_time = datetime.fromisoformat(article['publishedAt'].replace('Z', '+00:00'))
+                                if published_time.tzinfo is None:
+                                    published_time = published_time.replace(tzinfo=ZoneInfo("UTC"))
+                                utc_timestamp = int(published_time.timestamp())
+                                
+                                news_item = {
+                                    "title": article['title'],
+                                    "link": article['url'],
+                                    "publisher": article['source']['name'],
+                                    "symbols": [symbol.upper()],
+                                    "utcTime": utc_timestamp,
+                                    "keywords": [],
+                                    "html_content": article.get('html_content', '')  # Use get() with default value
+                                }
+                                print(f"🔍 ===========News Item: {news_item}")
+                                news_data.append(news_item)
+                            except Exception as e:
+                                logger.error(f"處理 Newsfilter 新聞項目時出錯: {e}")
+                                continue
 
                     if news_data:
                         # 使用原有的 RVLNewsAnalyzer 來處理新聞
@@ -730,4 +742,5 @@ class Summarizer:
             ]
         )
         summary = completion.choices[0].message.content.strip()
+        print(f"\n📰 Summary: {summary}\n")
         return summary

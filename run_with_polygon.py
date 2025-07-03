@@ -21,6 +21,7 @@ def main(debug = False):
         top_gainers_symbols = pc.get_top_gainers_list()
         filtered_top_gainers_symbols = pc.get_filtered_top_gainers_list()
         clean_filtered_top_gainers_symbols = pc.clean_symbols(filtered_top_gainers_symbols) #['SBET', 'MBAVW', 'FAAS']
+
         #endregion
 
        #region DataHandler

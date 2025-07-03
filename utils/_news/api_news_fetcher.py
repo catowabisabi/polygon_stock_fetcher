@@ -101,7 +101,7 @@ class RVLNewsAnalyzer:
                 "title": self.clean_html(news.get("title", "")),
                 "time": readable_time,
                 "link": news.get("link", ""),
-                "html": self.clean_html(news.get("link", ""))
+                "html": news.get("html_content") if news.get("html_content") else self.clean_html(news.get("link", ""))  # Use html_content as is if available, otherwise clean the link
             }
 
             summary = self.summerizer.summarize(entry)
