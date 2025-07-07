@@ -364,14 +364,15 @@ class SECFinancialAnalyzer:
                 df[col] = "N/A"
         
         # 检查是否有错误数据并打印
-        error_cases = df[df['Error'].notna()]
-        if not error_cases.empty:
-            print("\n" + "="*120)
-            print("ERRORS IN DATA FETCHING".center(120))
-            print("="*120)
-            for _, row in error_cases.iterrows():
-                print(f"Symbol: {row['Symbol']} - Error: {row['Error']}")
-            print("="*120)
+        if 'Error' in df.columns:
+            error_cases = df[df['Error'].notna()]
+            if not error_cases.empty:
+                print("\n" + "="*120)
+                print("ERRORS IN DATA FETCHING".center(120))
+                print("="*120)
+                for _, row in error_cases.iterrows():
+                    print(f"Symbol: {row['Symbol']} - Error: {row['Error']}")
+                print("="*120)
         
         # 格式化打印所有数据
         print("\n" + "="*120)
@@ -391,10 +392,12 @@ class SECFinancialAnalyzer:
         
         # 打印风险分布摘要（只统计非错误和非N/A的数据）
         valid_risk_data = df[
-            (df['Error'].isna()) & 
             (df['ATM Risk Level'].notna()) & 
             (df['ATM Risk Level'] != "N/A")
         ]
+        if 'Error' in df.columns:
+            valid_risk_data = valid_risk_data[valid_risk_data['Error'].isna()]
+            
         if not valid_risk_data.empty:
             risk_dist = valid_risk_data['ATM Risk Level'].value_counts()
             print("\nRISK DISTRIBUTION:")
@@ -411,7 +414,8 @@ class SECFinancialAnalyzer:
         print("TRADING RECOMMENDATIONS".center(120))
         print("="*120)
         for result in results:
-            if "Error" in result:
+            # 检查是否有错误
+            if isinstance(result, dict) and result.get('Error'):
                 print(f"\n{result['Symbol']} - Unable to generate recommendations due to error: {result['Error']}")
                 continue
                 
