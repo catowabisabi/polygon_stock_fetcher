@@ -20,19 +20,27 @@ def main(debug = False):
         top_gainers_price_data = pc.get_top_gainers_data(debug=debug)
         top_gainers_symbols = pc.get_top_gainers_list()
         filtered_top_gainers_symbols = pc.get_filtered_top_gainers_list()
-        clean_filtered_top_gainers_symbols = pc.clean_symbols(filtered_top_gainers_symbols) #['SBET', 'MBAVW', 'FAAS']
+        clean_filtered_top_gainers_symbols = pc.clean_symbols(filtered_top_gainers_symbols)
+
+        # Check if we have any symbols to process
+        if not clean_filtered_top_gainers_symbols:
+            current_time = datetime.now(pytz.timezone('US/Eastern'))
+            logger.info(f"No symbols match criteria at {current_time.strftime('%Y-%m-%d %H:%M:%S %Z')}")
+            return
 
         #endregion
 
        #region DataHandler
         data_handler = DataHandler()
+        top_gainners_fundamentals, sec_analysis_results = data_handler.run(clean_filtered_top_gainers_symbols)
 
-        
-        top_gainners_fundamentals, sec_analysis_results = data_handler.run(clean_filtered_top_gainers_symbols) #top_gainners_symbols contain all data of every top gainers
-  
+        # Only try to print data if we have results
+        if top_gainners_fundamentals and len(top_gainners_fundamentals) > 0:
+            print(top_gainners_fundamentals[0]['1m_chart_data'][0])
+            print("\n\n\n\n")
+        else:
+            logger.info("No fundamental data returned from data handler")
 
-        print(top_gainners_fundamentals[0]['1m_chart_data'][0])
-        print("\n\n\n\n")
     except Exception as e:
         error_msg = f"程序執行出錯：{str(e)}\n請檢查日誌獲取詳細信息。"
         send_msg_to_telegram(error_msg)
