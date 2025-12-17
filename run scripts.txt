@@ -1,0 +1,2 @@
+(tradebot) PS C:\Users\admin\Desktop\Code\polygon_stock_fetc
+her> python run_with_polygon.py
