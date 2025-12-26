@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  polygon_fetcher:
+    container_name: polygon-fetcher
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      TZ: America/New_York
+      CHROME_BIN: /usr/bin/google-chrome
+    volumes:
+      - ./cache:/app/cache
+      - ./logs:/app/logs
+    shm_size: "2g"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import schedule"]
+      interval: 1m
+      timeout: 10s
+      retries: 3

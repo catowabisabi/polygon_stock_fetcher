@@ -52,6 +52,45 @@ TELEGRAM_CHAT_ID=your_chat_id                              # 可選
 
 ---
 
+## 🐳 Docker 部署 / Docker Deployment (TrueNAS SCALE)
+
+### 必要條件 / Prerequisites
+- TrueNAS SCALE 24.10 以上版本並啟用 Docker / Docker Compose 支援。
+- 具有 Shell 或 Apps CLI 操作權限。
+- 已在專案根目錄建立 `.env`，內容與上述環境變數相同。
+
+### 建構與部署步驟 / Build & Run Steps
+1. **複製程式碼至資料集** / Clone this repo into a dataset that TrueNAS can mount。
+2. **建置映像** / Build the image：
+  ```bash
+  docker compose build
+  ```
+3. **啟動服務** / Start the service：
+  ```bash
+  docker compose up -d
+  ```
+4. TrueNAS SCALE 會自動建立 `cache/` 與 `logs/` 卷，用於保存快取與日誌。
+
+### 容器設置重點 / Container Notes
+- 基底映像為 `python:3.11-slim`，並預先安裝 Google Chrome 以支援 Headless 自動化。
+- `docker-compose.yml` 已將時區設為 `America/New_York`，可依需求覆寫。
+- 如果需要連線到外部 MongoDB，請在 `.env` 中設定 `MONGODB_CONNECTION_STRING`。
+- Windows 專用的 ZeroPro 自動化模組不會在容器中啟用，但不影響主要資料抓取流程。
+
+### 常用維運指令 / Operations
+```bash
+# 查看日誌 / Tail logs
+docker compose logs -f
+
+# 重新啟動服務 / Restart service
+docker compose restart
+
+# 停止並移除容器 / Stop and remove
+docker compose down
+```
+
+---
+
 ## 專案簡介
 
 這是一個功能完整的股票數據獲取與分析系統，整合 Polygon.io API 來獲取實時市場數據。系統能自動掃描市場中的漲幅股票，進行基本面分析、SEC文件檢索，並通過 Telegram 發送通知。

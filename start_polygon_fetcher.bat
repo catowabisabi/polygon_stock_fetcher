@@ -1,5 +1,6 @@
 @echo off
 chcp 65001 >nul
+TITLE Polygon Stock Fetcher
 REM ========================================
 REM Polygon Stock Fetcher - Quick Start Script
 REM ========================================
