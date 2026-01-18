@@ -36,8 +36,14 @@ def main(debug = False):
 
         # Only try to print data if we have results
         if top_gainners_fundamentals and len(top_gainners_fundamentals) > 0:
-            print(top_gainners_fundamentals[0]['1m_chart_data'][0])
-            print("\n\n\n\n")
+            # 檢查是否有圖表數據
+            if '1m_chart_data' in top_gainners_fundamentals[0] and len(top_gainners_fundamentals[0]['1m_chart_data']) > 0:
+                print("=== 第一個股票的第一筆 1 分鐘圖表數據 ===")
+                print(top_gainners_fundamentals[0]['1m_chart_data'][0])
+                print("\n\n")
+            else:
+                logger.warning("圖表數據為空或不存在")
+                logger.info(f"可用的數據欄位: {top_gainners_fundamentals[0].keys()}")
         else:
             logger.info("No fundamental data returned from data handler")
 
