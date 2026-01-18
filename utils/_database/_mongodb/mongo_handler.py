@@ -16,9 +16,7 @@ load_dotenv(override=True)
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
-
-
-from program_starter.class_zeropro_starter import logger
+from utils.logger.shared_logger import logger
 
 
 class MongoHandler:
@@ -33,7 +31,7 @@ class MongoHandler:
             self.ny_time = datetime.now(NY_TZ)
             self.today_str = self.ny_time.strftime('%Y-%m-%d')
         except Exception as e:
-            print(f"Connection error: {e}")
+            print("Connection error:", e)
             self.client = None
             self.db = None
 
@@ -75,7 +73,7 @@ class MongoHandler:
             result = self.db[collection_name].insert_one(doc)
             return result.inserted_id
         except Exception as e:
-            print(f"Insert error: {e}")
+            print("Insert error:", e)
             return None
 
     def find_doc(self, collection_name, query):
@@ -86,7 +84,7 @@ class MongoHandler:
         try:
             return list(self.db[collection_name].find(query))
         except Exception as e:
-            print(f"Find error: {e}")
+            print("Find error:", e)
             return []
 
     def update_doc(self, collection_name, query, update):
@@ -98,7 +96,7 @@ class MongoHandler:
             result = self.db[collection_name].update_many(query, {'$set': update})
             return result.modified_count  # 回傳更新的筆數
         except Exception as e:
-            print(f"Update error: {e}")
+            print("Update error:", e)
             return None
 
     def upsert_doc(self, collection_name, query_keys: dict, new_data: dict):
@@ -181,7 +179,7 @@ class MongoHandler:
             }
 
         except Exception as e:
-            print(f"Upsert error: {e}")
+            print("Upsert error:", e)
             return None
     
     def delete_doc(self, collection_name, query):
@@ -193,23 +191,23 @@ class MongoHandler:
             result = self.db[collection_name].delete_many(query)
             return result.deleted_count
         except Exception as e:
-            print(f"Delete error: {e}")
+            print("Delete error:", e)
             return None
         
 
 if __name__ == "__main__":
     mongo_handler = MongoHandler()
-    print(f"Connected: {mongo_handler.is_connected()}")
-    print(f"Collection is created: {mongo_handler.create_collection("test_collection")}")
-    print(f"Collection is found: {mongo_handler.find_collection('test_collection')}")
+    print("Connected:", mongo_handler.is_connected())
+    print("Collection is created:", mongo_handler.create_collection('test_collection'))
+    print("Collection is found:", mongo_handler.find_collection('test_collection'))
 
-    print(f"Document is created: {mongo_handler.create_doc('test_collection', {'name': 'John', 'age': 30})}")
-    print(f"Document is found: {mongo_handler.find_doc('test_collection', {'name': 'John'})}")
+    print("Document is created:", mongo_handler.create_doc('test_collection', {'name': 'John', 'age': 30}))
+    print("Document is found:", mongo_handler.find_doc('test_collection', {'name': 'John'}))
 
-    print(f"Document is updated: {mongo_handler.update_doc('test_collection', {'name': 'John'}, {'age': 31})}")
-    print(f"Document is found: {mongo_handler.find_doc('test_collection', {'name': 'John'})}")
-    print(f"Document is deleted: {mongo_handler.delete_doc('test_collection', {'name': 'John'})}")
+    print("Document is updated:", mongo_handler.update_doc('test_collection', {'name': 'John'}, {'age': 31}))
+    print("Document is found:", mongo_handler.find_doc('test_collection', {'name': 'John'}))
+    print("Document is deleted:", mongo_handler.delete_doc('test_collection', {'name': 'John'}))
 
-    print(f"Document is upserted: {mongo_handler.upsert_doc('test_collection', {'name': 'John'}, {'age': 31})}")
-    print(f"Document is found: {mongo_handler.find_doc('test_collection', {'name': 'John'})}")
+    print("Document is upserted:", mongo_handler.upsert_doc('test_collection', {'name': 'John'}, {'age': 31}))
+    print("Document is found:", mongo_handler.find_doc('test_collection', {'name': 'John'}))
     

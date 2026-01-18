@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   polygon_fetcher:
     container_name: polygon-fetcher

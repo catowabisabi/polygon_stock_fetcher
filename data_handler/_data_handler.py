@@ -11,7 +11,7 @@ from get_sec_filings.get_sec_filings_6_demo_cache import SECFinancialAnalyzer
 from utils._database._mongodb.mongo_handler import MongoHandler
 
 from zoneinfo import ZoneInfo
-from program_starter.class_zeropro_starter import logger
+from utils.logger.shared_logger import logger
 from datetime import datetime, timedelta
 import time
 import json

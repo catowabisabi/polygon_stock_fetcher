@@ -14,7 +14,7 @@ from polygon.rest.models import (
     TickerSnapshot,
 )
 
-from program_starter.class_zeropro_starter import logger 
+from utils.logger.shared_logger import logger 
 from database._mongodb.mongo_handler import MongoHandler
 from data_handler._data_handler import DataHandler
 from dotenv import load_dotenv

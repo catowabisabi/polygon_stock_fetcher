@@ -5,8 +5,16 @@ import time
 from datetime import datetime, time as dt_time
 import pytz
 
-from program_starter.class_zeropro_starter import logger 
-from program_starter.class_zeropro_starter import ZeroProAutomation
+from utils.logger.shared_logger import logger
+
+# 可選導入 ZeroProAutomation（Windows 專用）
+try:
+    from program_starter.class_zeropro_starter import ZeroProAutomation
+    ZEROPRO_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"ZeroProAutomation not available (likely running in non-Windows environment): {e}")
+    ZeroProAutomation = None
+    ZEROPRO_AVAILABLE = False
 from get_gainer.zero_pro_inspector.zp_inspector import DynamicUIFinder 
 from data_handler._data_handler import DataHandler    
 
@@ -116,6 +124,10 @@ def initialize_zeropro():
     啟動 ZeroPro，並獲取主視窗代碼（HWND）
     Launch ZeroPro and get the main window handle.
     """
+    if not ZEROPRO_AVAILABLE:
+        logger.warning("ZeroProAutomation is not available. Skipping ZeroPro initialization.")
+        return None
+        
     zp = ZeroProAutomation()
     hwnd = zp.find_main_window()
 
@@ -194,13 +206,25 @@ def main():
     hwnd = initialize_zeropro()
     
     # 擷取漲幅榜資料
-    top_list_df, cleaned_symbols = get_top_list_data(hwnd)
+    if hwnd:
+        top_list_df, cleaned_symbols = get_top_list_data(hwnd)
+    else:
+        logger.warning("No ZeroPro window available. Using fallback method for symbols.")
+        # 可以在這裡添加替代的股票數據來源
+        cleaned_symbols = []
+        top_list_df = None
 
     # 寫入 watchlist 資料表 Write watch list data to database
-    process_watch_list(top_list_df, db, table_name)
+    if top_list_df is not None:
+        process_watch_list(top_list_df, db, table_name)
+    else:
+        logger.warning("No watchlist data to process")
 
     # 執行分析並寫入 local DB
-    run_data_analysis(cleaned_symbols)
+    if cleaned_symbols:
+        run_data_analysis(cleaned_symbols)
+    else:
+        logger.warning("No symbols to analyze")
 
 
 
