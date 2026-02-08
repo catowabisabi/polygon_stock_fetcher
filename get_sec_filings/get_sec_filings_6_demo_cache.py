@@ -560,8 +560,8 @@ class SECFinancialAnalyzer:
         
         cik_map = self.load_cik_mapping()
         if not cik_map:
-            print("Failed to load CIK mappings. Exiting.")
-            return None
+            print("Failed to load CIK mappings. Returning empty results.")
+            return []  # 返回空列表而不是None
         
         results = []
 

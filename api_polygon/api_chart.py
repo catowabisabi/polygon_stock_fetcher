@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class ChartAnalyzer:
-    def __init__(self, symbol: str):
+    def __init__(self, symbol: str, data_delay_minutes: int = 15):
         self.symbol = symbol
         self.polygon_api_key = os.getenv("POLYGON_KEY")
         if not self.polygon_api_key:
@@ -20,6 +20,7 @@ class ChartAnalyzer:
         self.client = RESTClient(self.polygon_api_key)
         self.market_open_time = dtime(9, 30)
         self.ny_tz = ZoneInfo("America/New_York")
+        self.data_delay_minutes = data_delay_minutes  # 數據延遲（分鐘）
 
         print(f"🔍 正在為 {self.symbol} 獲取圖表數據...")
         # 初始化時獲取數據
@@ -45,24 +46,36 @@ class ChartAnalyzer:
         else:
             self.last_day_data_1m = []
 
-    def get_1m(self):
-        """獲取1分鐘K線數據 - 從今天4:15 AM (ET)開始"""
-        # 直接获取纽约时间
+    def get_adjusted_now(self):
+        """獲取考慮數據延遲的調整時間"""
         ny_now = datetime.now(self.ny_tz)
+        adjusted_now = ny_now - timedelta(minutes=self.data_delay_minutes)
+        logger.info(f"實際時間: {ny_now.strftime('%H:%M:%S')}, 調整後時間: {adjusted_now.strftime('%H:%M:%S')} (延遲{self.data_delay_minutes}分鐘)")
+        return adjusted_now
+    
+    def get_1m(self):
+        """獲取1分鐘K線數據 - 從今天4:15 AM (ET)開始，考慮數據延遲"""
+        # 获取调整后的时间
+        adjusted_now = self.get_adjusted_now()
         
         # 计算纽约时间的今天4:15 AM
-        ny_today_415am = ny_now.replace(hour=4, minute=15, second=0, microsecond=0)
+        ny_today_415am = adjusted_now.replace(hour=4, minute=15, second=0, microsecond=0)
         
-        # 如果当前时间早于今天4:15 AM，则使用昨天的4:15 AM
-        if ny_now < ny_today_415am:
+        # 如果调整后时间早于今天4:15 AM，则使用昨天的4:15 AM
+        if adjusted_now < ny_today_415am:
             ny_today_415am = ny_today_415am - timedelta(days=1)
+        
+        # 确保不会请求未来的数据
+        if adjusted_now <= ny_today_415am:
+            logger.warning(f"調整後時間 {adjusted_now} 早於開始時間 {ny_today_415am}，返回空數據")
+            return []
         
         # 转换为 UTC 时间并获取毫秒时间戳
         today_415am_utc = ny_today_415am.astimezone(self.ny_tz)
-        now_utc = ny_now.astimezone(self.ny_tz)
+        adjusted_now_utc = adjusted_now.astimezone(self.ny_tz)
         
         from_timestamp = int(today_415am_utc.timestamp() * 1000)
-        to_timestamp = int(now_utc.timestamp() * 1000)
+        to_timestamp = int(adjusted_now_utc.timestamp() * 1000)
         
         try:
             aggs = []
@@ -91,25 +104,29 @@ class ChartAnalyzer:
             ] if aggs else []
             
         except Exception as e:
-            logger.error(f"Error fetching 1m data: {e}")
+            error_msg = str(e)
+            if "NOT_AUTHORIZED" in error_msg:
+                logger.warning(f"1m數據需要升級Polygon.io計劃: {error_msg}")
+            else:
+                logger.error(f"Error fetching 1m data: {e}")
             return []
 
     def get_5m(self):
-        """獲取5分鐘K線數據 - 從前天4:15 AM (ET)開始"""
-        ny_now = datetime.now(self.ny_tz)
-        ny_two_days_ago = ny_now - timedelta(days=2)
+        """獲取5分鐘K線數據 - 從前天4:15 AM (ET)開始，考慮數據延遲"""
+        adjusted_now = self.get_adjusted_now()
+        ny_two_days_ago = adjusted_now - timedelta(days=2)
         ny_two_days_ago_415am = ny_two_days_ago.replace(hour=4, minute=15, second=0, microsecond=0)
 
-        print(ny_two_days_ago_415am)
+        logger.info(f"5m數據開始時間: {ny_two_days_ago_415am}")
         
-        if ny_now.time() < dtime(4, 15):
+        if adjusted_now.time() < dtime(4, 15):
             ny_two_days_ago_415am = ny_two_days_ago_415am - timedelta(days=1)
         
         two_days_ago_415am_utc = ny_two_days_ago_415am.astimezone(ZoneInfo("UTC"))
-        now_utc = ny_now.astimezone(ZoneInfo("UTC"))
+        adjusted_now_utc = adjusted_now.astimezone(ZoneInfo("UTC"))
         
         from_timestamp = int(two_days_ago_415am_utc.timestamp() * 1000)
-        to_timestamp = int(now_utc.timestamp() * 1000)
+        to_timestamp = int(adjusted_now_utc.timestamp() * 1000)
 
         #print(from_timestamp)
         #print(to_timestamp)
@@ -153,20 +170,20 @@ class ChartAnalyzer:
             return []
 
     def get_1d(self):
-        """獲取日K線數據 - 最近兩年"""
-        # 直接获取纽约时间
-        ny_now = datetime.now(self.ny_tz)
+        """獲取日K線數據 - 過去兩年，考慮數據延遲"""
+        # 獲取調整後的紐約時間
+        adjusted_now = self.get_adjusted_now()
         
         # 计算纽约时间两年前的日期
-        ny_two_years_ago = ny_now - timedelta(days=730)
+        ny_two_years_ago = adjusted_now - timedelta(days=730)
         
-        # 如果当前时间早于4:15 AM，则使用前一天作为结束日期
-        if ny_now.time() < dtime(4, 15):
-            ny_now = ny_now - timedelta(days=1)
+        # 如果调整后时间早于4:15 AM，则使用前一天作为结束日期
+        if adjusted_now.time() < dtime(4, 15):
+            adjusted_now = adjusted_now - timedelta(days=1)
         
-        # 转换为 UTC 时间 (ET+4)
+        # 转换为 UTC 时间
         two_years_ago_utc = ny_two_years_ago.astimezone(ZoneInfo("UTC"))
-        now_utc = ny_now.astimezone(ZoneInfo("UTC"))
+        adjusted_now_utc = adjusted_now.astimezone(ZoneInfo("UTC"))
         
         try:
             aggs = self.client.get_aggs(
@@ -174,7 +191,7 @@ class ChartAnalyzer:
                 multiplier=1,
                 timespan='day',
                 from_=two_years_ago_utc.strftime('%Y-%m-%d'),
-                to=now_utc.strftime('%Y-%m-%d'),
+                to=adjusted_now_utc.strftime('%Y-%m-%d'),
                 limit=500
             )
             
@@ -365,14 +382,17 @@ class ChartAnalyzer:
 if __name__ == "__main__":
     #symbol = input("請輸入股票代號（如 TSLA）: ").strip().upper()
     symbol = "TSLA"
-    analyzer = ChartAnalyzer(symbol)
+    # 測試延遲數據配置（默認15分鐘延遲）
+    analyzer = ChartAnalyzer(symbol, data_delay_minutes=15)
     result = analyzer.run()
-    print(len(result['1m_chart_data']))
-    print(result['1m_chart_data'][0]['datetime'])
-    print(result['1m_chart_data'][-1]['datetime'])
-    print(len(result['5m_chart_data']))
-    print(result['5m_chart_data'][0]['datetime'])
-    print(result['5m_chart_data'][-1]['datetime'])  
-    print(len(result['1d_chart_data']))
-    print(result['1d_chart_data'][-1])
+    print(f"數據延遲配置: {analyzer.data_delay_minutes} 分鐘")
+    print(f"1m數據數量: {len(result['1m_chart_data'])}")
+    if result['1m_chart_data']:
+        print(f"1m數據時間範圍: {result['1m_chart_data'][0]['datetime']} 到 {result['1m_chart_data'][-1]['datetime']}")
+    print(f"5m數據數量: {len(result['5m_chart_data'])}")
+    if result['5m_chart_data']:
+        print(f"5m數據時間範圍: {result['5m_chart_data'][0]['datetime']} 到 {result['5m_chart_data'][-1]['datetime']}")
+    print(f"1d數據數量: {len(result['1d_chart_data'])}")
+    if result['1d_chart_data']:
+        print(f"最新日K線: {result['1d_chart_data'][-1]}")
     #print(json_util.dumps(result, indent=2, ensure_ascii=False))

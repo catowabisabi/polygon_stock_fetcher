@@ -197,8 +197,11 @@ class DataHandler:
     def get_analyzer_data(self, symbol):
         """Get market data for a single symbol using ChartAnalyzer."""
         try:
+            # 從環境變數獲取數據延遲配置，默認15分鐘
+            data_delay = int(os.getenv('POLYGON_DATA_DELAY_MINUTES', '15'))
+            
             # 使用新的 ChartAnalyzer 來獲取和分析數據
-            analyzer = ChartAnalyzer(symbol)
+            analyzer = ChartAnalyzer(symbol, data_delay_minutes=data_delay)
             result = analyzer.run()
             
             # 將分析結果轉換為所需的格式
@@ -599,6 +602,15 @@ class DataHandler:
             analyzer = SECFinancialAnalyzer()
             analyzer.SYMBOL_LIST = symbols_to_analyze
             analysis_results = analyzer.run_analysis()
+
+            # 檢查結果是否為空
+            if analysis_results is None:
+                logger.warning("SEC分析返回None，跳過處理")
+                return 0
+            
+            if not isinstance(analysis_results, (list, tuple)):
+                logger.warning(f"SEC分析返回類型錯誤: {type(analysis_results)}，跳過處理")
+                return 0
 
             # 直接更新到數據庫
             for analysis_result in analysis_results:

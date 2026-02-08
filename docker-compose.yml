@@ -10,7 +10,7 @@ services:
       CHROME_BIN: /usr/bin/google-chrome
     volumes:
       - ./cache:/app/cache
-      - ./cache:/app/data
+      - ./cache:/app/data  # 同一目錄掛載，確保數據訪問
       - ./logs:/app/logs
     shm_size: "2g"
     healthcheck:

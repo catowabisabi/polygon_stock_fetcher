@@ -31,7 +31,7 @@ def should_run_now():
     now = now_dt.time()
 
     # Skip weekends
-    if now_dt.weekday() >= 8:  # 5 = Saturday, 6 = Sunday
+    if now_dt.weekday() >= 5:  # 5 = Saturday, 6 = Sunday
         return False
 
     # Define the time periods and their corresponding intervals
