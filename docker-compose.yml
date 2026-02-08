@@ -10,6 +10,7 @@ services:
       CHROME_BIN: /usr/bin/google-chrome
     volumes:
       - ./cache:/app/cache
+      - ./cache:/app/data
       - ./logs:/app/logs
     shm_size: "2g"
     healthcheck:
