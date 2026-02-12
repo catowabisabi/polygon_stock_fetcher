@@ -507,23 +507,21 @@ class DataHandler:
                     # region Newsfilter API
                     news_filter_api = NewsfilterAPI()
                     news_filter_api_result = news_filter_api.get_news_from_newsfilter(symbol)
-                    if news_filter_api_result and news_filter_api_result.get('articles'):
-                        for article in news_filter_api_result['articles']:
+                    # API returns a list directly, not {"articles": [...]}
+                    if isinstance(news_filter_api_result, list) and len(news_filter_api_result) > 0:
+                        for article in news_filter_api_result:
                             try:
-                                # Convert publishedAt string to UTC timestamp
-                                published_time = datetime.fromisoformat(article['publishedAt'].replace('Z', '+00:00'))
-                                if published_time.tzinfo is None:
-                                    published_time = published_time.replace(tzinfo=ZoneInfo("UTC"))
-                                utc_timestamp = int(published_time.timestamp())
+                                # API returns 'timestamp' (unix epoch) directly
+                                utc_timestamp = article.get('timestamp', 0)
                                 
                                 news_item = {
-                                    "title": article['title'],
-                                    "link": article['url'],
-                                    "publisher": article['source']['name'],
-                                    "symbols": [symbol.upper()],
+                                    "title": article.get('title', ''),
+                                    "link": article.get('link', ''),
+                                    "publisher": article.get('source', 'Unknown'),  # source is a string
+                                    "symbols": article.get('tickers', [symbol.upper()]),
                                     "utcTime": utc_timestamp,
-                                    "keywords": [],
-                                    "html_content": article.get('html_content', '')  # Use get() with default value
+                                    "keywords": article.get('keywords', []),
+                                    "html_content": article.get('summary', '')  # use summary as content
                                 }
                                 print(f"🔍 ===========News Item: {news_item}")
                                 news_data.append(news_item)
@@ -549,7 +547,7 @@ class DataHandler:
                         try:
                             result = self.mongo_handler.upsert_doc(
                                 "fundamentals_of_top_list_symbols",
-                                {"symbol": symbol, "today_date": datetime.now(ZoneInfo("UTC")).strftime('%Y-%m-%d')},
+                                {"symbol": symbol, "today_date": datetime.now(ZoneInfo("America/New_York")).strftime('%Y-%m-%d')},
                                 {"suggestion": suggestion}
                             )
                             logger.info(f"保存建議 {symbol}: {result}")

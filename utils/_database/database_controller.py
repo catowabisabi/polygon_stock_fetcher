@@ -1,8 +1,8 @@
-from _mongodb.mongo_handler import MongoHandler
+from utils._database._mongodb.mongo_handler import MongoHandler
 
-from utils.logger.logger import logger
+from utils.logger.shared_logger import logger
 from datetime import datetime
-import pytz
+from zoneinfo import ZoneInfo
 
 
 class DatabaseController:
@@ -10,7 +10,7 @@ class DatabaseController:
         self.mongo_handler = MongoHandler()
 
     def initialize_database_collections(self, today_top_list_doc_name = "today_top_list", fundamentals_of_top_list_symbols_doc_name = "fundamentals_of_top_list_symbols"):
-        logger.info(f"{datetime.now(pytz.timezone('US/Eastern'))}: Setting up Collections for {today_top_list_doc_name} and {fundamentals_of_top_list_symbols_doc_name}")
+        logger.info(f"{datetime.now(ZoneInfo('America/New_York'))}: Setting up Collections for {today_top_list_doc_name} and {fundamentals_of_top_list_symbols_doc_name}")
         self.mongo_handler.create_collection(today_top_list_doc_name)
         self.mongo_handler.create_collection(fundamentals_of_top_list_symbols_doc_name)
 

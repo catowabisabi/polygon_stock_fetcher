@@ -13,13 +13,15 @@ from bson import json_util
 load_dotenv(override=True)
 
 
-from datetime import datetime, timezone
+from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from utils.logger.shared_logger import logger
 
 
 class MongoHandler:
+    NY_TZ = ZoneInfo("America/New_York")
+
     def __init__(self, mongodb_connection_string = None):
         try:
             mongo_uri = os.getenv("MONGODB_CONNECTION_STRING")
@@ -27,13 +29,20 @@ class MongoHandler:
                 mongo_uri = mongodb_connection_string
             self.client = MongoClient(mongo_uri, serverSelectionTimeoutMS=3000)
             self.db = self.client[os.getenv("MONGO_DBNAME", "TradeZero_Bot")]
-            NY_TZ = ZoneInfo("America/New_York")
-            self.ny_time = datetime.now(NY_TZ)
-            self.today_str = self.ny_time.strftime('%Y-%m-%d')
         except Exception as e:
             print("Connection error:", e)
             self.client = None
             self.db = None
+
+    @property
+    def ny_time(self):
+        """Always return current NY time (not stale init-time value)"""
+        return datetime.now(self.NY_TZ)
+
+    @property
+    def today_str(self):
+        """Always return current NY date string"""
+        return self.ny_time.strftime('%Y-%m-%d')
 
     def is_connected(self):
         if not self.client:
@@ -67,9 +76,9 @@ class MongoHandler:
         if collection_name not in self.db.list_collection_names():
             return None
         try:
-            # 使用带时区的日期时间
-            doc["today_date"] = self.ny_time.strftime('%Y-%m-%d')
-            doc["created_at"] = datetime.now(timezone.utc)
+            # 使用帶時區的日期時間 (每次呼叫時取得最新 NY 時間)
+            doc["today_date"] = self.today_str
+            doc["created_at"] = datetime.now(self.NY_TZ)
             result = self.db[collection_name].insert_one(doc)
             return result.inserted_id
         except Exception as e:
@@ -111,10 +120,9 @@ class MongoHandler:
                 logger.info(f"從更新數據中移除 _id 字段")
                 new_data = {k: v for k, v in new_data.items() if k != '_id'}
             
-            # 使用帶時區的日期時間
-            
-            new_data["today_date"] = self.ny_time.strftime('%Y-%m-%d')
-            new_data["updated_at"] = datetime.now(timezone.utc)
+            # 使用帶時區的日期時間 (每次呼叫時取得最新 NY 時間)
+            new_data["today_date"] = self.today_str
+            new_data["updated_at"] = datetime.now(self.NY_TZ)
 
             result = self.db[collection_name].update_one(
                 filter=query_keys,
@@ -151,8 +159,8 @@ class MongoHandler:
             return None
 
         try:
-            # 使用带时区的日期时间
-            today_str = self.ny_time.strftime('%Y-%m-%d')
+            # 使用帶時區的日期時間 (每次呼叫時取得最新 NY 時間)
+            today_str = self.today_str
             query = {"today_date": today_str}
 
             existing_doc = self.db[collection_name].find_one(query)
@@ -167,7 +175,7 @@ class MongoHandler:
                 update={"$set": {
                     "today_date": today_str,
                     "top_list": combined_list,
-                    "updated_at": datetime.now(timezone.utc)
+                    "updated_at": datetime.now(self.NY_TZ)
                 }},
                 upsert=True
             )
