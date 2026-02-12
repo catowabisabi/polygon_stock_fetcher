@@ -69,8 +69,13 @@ RUN pip install --no-cache-dir --upgrade pip \
 
 COPY --chown=${APP_USER}:${APP_USER} . .
 
-RUN mkdir -p /app/cache /app/logs
+RUN mkdir -p /app/cache /app/logs \
+ && chown -R ${APP_USER}:${APP_USER} /app/cache /app/logs
 
-USER ${APP_USER}
+# Install gosu for dropping privileges in entrypoint
+RUN apt-get update && apt-get install -y --no-install-recommends gosu && rm -rf /var/lib/apt/lists/*
 
-ENTRYPOINT ["python", "run_with_polygon.py"]
+COPY --chown=root:root entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
