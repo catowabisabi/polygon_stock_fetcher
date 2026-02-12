@@ -63,11 +63,11 @@ RUN groupadd --system ${APP_USER} \
 
 WORKDIR /app
 
-COPY requirements.txt ./
+COPY --chown=${APP_USER}:${APP_USER} requirements.txt ./
 RUN pip install --no-cache-dir --upgrade pip \
  && pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY --chown=${APP_USER}:${APP_USER} . .
 
 RUN mkdir -p /app/cache /app/logs
 
